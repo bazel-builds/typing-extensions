@@ -10,8 +10,8 @@ consumed as a Bazel dependency without relying on pip.
   `4.16.0`. Don't hand-edit files under here; see "Updating the vendored
   source" below.
 - `BUILD` — Bazel targets for the library and its test suite.
-- `MODULE.bazel` / `MODULE.bazel.lock` — bzlmod dependencies (`rules_python`)
-  and the hermetic Python toolchain registration.
+- `MODULE.bazel` / `MODULE.bazel.lock` — bzlmod dependencies (`rules_python`,
+  `rules_license`) and the hermetic Python toolchain registration.
 - `.bazelversion` — pins the Bazel version via [Bazelisk](https://github.com/bazelbuild/bazelisk).
 - `.bazelrc` — build flags (see "Bootstrap flag" below).
 - `LICENSE` — copied verbatim from `typing_extensions/LICENSE` (PSF License
@@ -59,6 +59,25 @@ in-process without exporting `PYTHONPATH`, so tests that spawn a subprocess
 `PYTHONPATH` as a real environment variable, which subprocesses inherit.
 Without this flag, three of the upstream tests fail with
 `ModuleNotFoundError: No module named 'typing_extensions'`.
+
+## License metadata
+
+The `//:license` and `//:package_info` targets declare this package's license
+(PSF License Version 2 / SPDX `PSF-2.0`) using
+[`rules_license`](https://github.com/bazelbuild/rules_license), and
+`package(default_applicable_licenses = [":license"])` in `BUILD` attaches it
+to every target in this package. This doesn't block "incompatible" licenses
+on its own — it's metadata that a consumer's own compliance tooling can walk.
+To see it, run `rules_license`'s aspect against a target, e.g.:
+
+```sh
+bazel build //:typing_extensions \
+  --aspects=@rules_license//rules:gather_licenses_info.bzl%gather_licenses_info_and_write \
+  --output_groups=licenses
+```
+
+which writes a JSON manifest of the licenses used by that target's
+transitive dependencies to `bazel-bin/typing_extensions_licenses_info.json`.
 
 ## Updating the vendored source
 
