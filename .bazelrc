@@ -1,0 +1,5 @@
+# Use the legacy PYTHONPATH-based bootstrap instead of rules_python's default
+# venv-based one. The default bootstrap only patches sys.path in-process and
+# doesn't export PYTHONPATH, so subprocesses spawned by tests (e.g. via
+# `subprocess.run([sys.executable, ...])`) can't see py_library deps.
+build --@rules_python//python/config_settings:bootstrap_impl=script

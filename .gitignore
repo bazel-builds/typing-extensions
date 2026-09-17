@@ -1,0 +1,6 @@
+# Bazel
+/bazel-*
+
+# Python
+__pycache__/
+*.pyc
